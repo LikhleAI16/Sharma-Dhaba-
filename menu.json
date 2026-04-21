@@ -1,0 +1,25 @@
+{
+  "restaurant": "Sharma Dhaba",
+  "address": "Main Road, Your Town",
+  "phone": "9475840763",
+  "dishes": [
+    {
+      "id": 1,
+      "name": "Chicken Biryani",
+      "price": "Rs. 120",
+      "ingredients": "Rice, Chicken, Spices, Onion, Curd",
+      "description": "Slow cooked aromatic biryani",
+      "marker": "hiro",
+      "photo": "photos/biryani.jpg"
+    },
+    {
+      "id": 2,
+      "name": "Paneer Butter Masala",
+      "price": "Rs. 150",
+      "ingredients": "Paneer, Butter, Tomato, Cream, Spices",
+      "description": "Rich creamy paneer curry",
+      "marker": "kanji",
+      "photo": "photos/paneer.jpg"
+    }
+  ]
+}
