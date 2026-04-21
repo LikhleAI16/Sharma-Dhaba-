@@ -2,38 +2,61 @@
 <html>
 <head>
   <title>Sharma Dhaba AR Menu</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 
-  <!-- STEP A: Load A-Frame (gives browser 3D power) -->
-  <script src="https://aframe.io/releases/1.4.0/aframe.min.js">
-  </script>
-
-  <!-- STEP B: Load AR.js (connects 3D to camera) -->
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js">
-  </script>
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
   <style>
-    /* Hide scrollbar, make camera fullscreen */
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
+      padding: 0;
     }
 
-    /* Dish info card at bottom of screen */
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      background: black;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    #instructions {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.65);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      z-index: 9999;
+      text-align: center;
+      white-space: nowrap;
+    }
+
     #dish-card {
       position: fixed;
       bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.80);
       color: white;
-      padding: 15px 30px;
+      padding: 18px 30px;
       border-radius: 20px;
       text-align: center;
       display: none;
       z-index: 9999;
       min-width: 280px;
+      max-width: 90%;
     }
 
     #dish-card h2 {
@@ -43,35 +66,33 @@
     }
 
     #dish-card p {
-      margin: 4px 0;
+      margin: 5px 0;
       font-size: 15px;
+      color: #ffffff;
     }
 
-    /* Instructions shown before marker detected */
-    #instructions {
+    #restaurant-name {
       position: fixed;
-      top: 20px;
+      top: 60px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0,0,0,0.6);
+      background: rgba(255, 165, 0, 0.85);
       color: white;
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-size: 14px;
+      padding: 6px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: bold;
       z-index: 9999;
-      text-align: center;
+      white-space: nowrap;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- Top instruction text -->
-  <div id="instructions">
-    📷 Point camera at marker on menu card
-  </div>
+  <div id="instructions">📷 Point camera at marker on menu card</div>
+  <div id="restaurant-name">🍽️ Sharma Dhaba</div>
 
-  <!-- Dish info card (hidden until marker found) -->
   <div id="dish-card">
     <h2 id="dish-name"></h2>
     <p id="dish-price"></p>
@@ -79,18 +100,17 @@
     <p id="dish-description"></p>
   </div>
 
-  <!-- AR SCENE STARTS HERE -->
   <a-scene
     embedded
+    vr-mode-ui="enabled: false"
+    renderer="logarithmicDepthBuffer: true"
     arjs="sourceType: webcam;
           debugUIEnabled: false;
           detectionMode: mono_and_matrix;
           matrixCodeType: 3x3;">
 
-    <!-- DISH 1 on HIRO marker -->
-    <a-marker
-      preset="hiro"
-      id="marker-hiro">
+    <!-- DISH 1 — Hiro Marker -->
+    <a-marker preset="hiro" id="marker-hiro">
       <a-image
         src="photos/biryani.jpg"
         position="0 0.1 0"
@@ -99,19 +119,17 @@
         height="1.5">
       </a-image>
       <a-text
-        value="Chicken Biryani\nRs. 120"
-        position="0 0.1 0.9"
+        value="Chicken Biryani"
+        position="0 0.1 1.0"
         rotation="-90 0 0"
         align="center"
         color="#FFD700"
-        width="3">
+        width="3.5">
       </a-text>
     </a-marker>
 
-    <!-- DISH 2 on KANJI marker -->
-    <a-marker
-      preset="kanji"
-      id="marker-kanji">
+    <!-- DISH 2 — Kanji Marker -->
+    <a-marker preset="kanji" id="marker-kanji">
       <a-image
         src="photos/paneer.jpg"
         position="0 0.1 0"
@@ -120,58 +138,54 @@
         height="1.5">
       </a-image>
       <a-text
-        value="Paneer Masala\nRs. 150"
-        position="0 0.1 0.9"
+        value="Paneer Masala"
+        position="0 0.1 1.0"
         rotation="-90 0 0"
         align="center"
         color="#FFD700"
-        width="3">
+        width="3.5">
       </a-text>
     </a-marker>
 
     <a-entity camera></a-entity>
   </a-scene>
-  <!-- AR SCENE ENDS HERE -->
 
   <script>
-    // Load dish data from menu.json file
     fetch('menu.json')
-      .then(response => response.json())
-      .then(menuData => {
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(menuData) {
 
-        // Watch Hiro marker — show dish 1 info
         document.getElementById('marker-hiro')
           .addEventListener('markerFound', function() {
             showDishCard(menuData.dishes[0]);
-        });
+          });
 
-        // Watch Kanji marker — show dish 2 info
         document.getElementById('marker-kanji')
           .addEventListener('markerFound', function() {
             showDishCard(menuData.dishes[1]);
-        });
+          });
 
-        // Hide card when marker lost
         document.getElementById('marker-hiro')
           .addEventListener('markerLost', hideDishCard);
+
         document.getElementById('marker-kanji')
           .addEventListener('markerLost', hideDishCard);
+      })
+      .catch(function(error) {
+        console.log('Menu load error:', error);
       });
 
-    // Function to show dish card at bottom
     function showDishCard(dish) {
       document.getElementById('dish-card').style.display = 'block';
       document.getElementById('dish-name').textContent = dish.name;
-      document.getElementById('dish-price').textContent = 
-        '💰 Price: ' + dish.price;
-      document.getElementById('dish-ingredients').textContent = 
-        '🥘 ' + dish.ingredients;
-      document.getElementById('dish-description').textContent = 
-        '📝 ' + dish.description;
+      document.getElementById('dish-price').textContent = '💰 Price: ' + dish.price;
+      document.getElementById('dish-ingredients').textContent = '🥘 ' + dish.ingredients;
+      document.getElementById('dish-description').textContent = '📝 ' + dish.description;
       document.getElementById('instructions').style.display = 'none';
     }
 
-    // Function to hide dish card
     function hideDishCard() {
       document.getElementById('dish-card').style.display = 'none';
       document.getElementById('instructions').style.display = 'block';
@@ -180,3 +194,5 @@
 
 </body>
 </html>
+    
+        
